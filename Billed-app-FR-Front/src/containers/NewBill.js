@@ -28,6 +28,14 @@ export default class NewBill {
     const email = JSON.parse(localStorage.getItem("user")).email;
     formData.append("file", file);
     formData.append("email", email);
+    // TODO FIX [Bug Hunt] - Bills
+    const sendButton = window.document.getElementById("btn-send-bill");
+    const acceptedTypes = ["image/png", "image/jpeg", "image/jpg"];
+    if (acceptedTypes.includes(file.type)) {
+      sendButton.removeAttribute("disabled");
+    } else {
+      sendButton.setAttribute("disabled", "");
+    }
 
     this.store
       .bills()
