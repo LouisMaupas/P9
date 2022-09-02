@@ -36,7 +36,6 @@ export default class NewBill {
     } else {
       sendButton.setAttribute("disabled", "");
     }
-
     this.store
       .bills()
       .create({
