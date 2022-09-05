@@ -76,9 +76,16 @@ export default class {
     this.document = document;
     this.onNavigate = onNavigate;
     this.store = store;
-    $("#arrow-icon1").click((e) => this.handleShowTickets(e, bills, 1));
-    $("#arrow-icon2").click((e) => this.handleShowTickets(e, bills, 2));
-    $("#arrow-icon3").click((e) => this.handleShowTickets(e, bills, 3));
+    // TODO FIX : [Bug Hunt] - Dashboard : add status
+    $("#arrow-icon1").click((e) =>
+      this.handleShowTickets(e, bills, 1, "pending")
+    );
+    $("#arrow-icon2").click((e) =>
+      this.handleShowTickets(e, bills, 2, "accepted")
+    );
+    $("#arrow-icon3").click((e) =>
+      this.handleShowTickets(e, bills, 3, "refused")
+    );
     new Logout({ localStorage, onNavigate });
   }
 
@@ -139,10 +146,9 @@ export default class {
     this.onNavigate(ROUTES_PATH["Dashboard"]);
   };
 
-  handleShowTickets(e, bills, index) {
+  handleShowTickets(e, bills, index, status) {
     if (this.counter === undefined || this.index !== index) this.counter = 0;
     if (this.index === undefined || this.index !== index) this.index = index;
-    // TODO FIX : [Bug Hunt] - Dashboard
     if (this.counter % 2 === 0) {
       $(`#arrow-icon${this.index}`).css({ transform: "rotate(0deg)" });
       $(`#status-bills-container${this.index}`).html(
@@ -154,11 +160,12 @@ export default class {
       $(`#status-bills-container${this.index}`).html("");
       this.counter++;
     }
-
     bills.forEach((bill) => {
-      $(`#open-bill${bill.id}`).click((e) =>
-        this.handleEditTicket(e, bill, bills)
-      );
+      // TODO FIX : [Bug Hunt] - Dashboard attach event only for bills with coresponding status
+      if (bill.status === status)
+        $(`#open-bill${bill.id}`).click((e) =>
+          this.handleEditTicket(e, bill, bills)
+        );
     });
 
     return bills;
