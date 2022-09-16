@@ -22,7 +22,7 @@ const row = (bill) => {
 const rows = (data) => {
   // TODO FIX : [Bug report] - Bills
   // https://stackoverflow.com/a/29774197/14139451
-  data.map(
+  data?.data.map(
     (obj) => (obj.date = new Date(obj.date).toISOString().split("T")[0])
   );
   const sortedDesc = data.sort(
