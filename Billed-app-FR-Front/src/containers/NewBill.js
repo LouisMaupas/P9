@@ -2,10 +2,11 @@ import { ROUTES_PATH } from "../constants/routes.js";
 import Logout from "./Logout.js";
 
 export default class NewBill {
-  constructor({ document, onNavigate, store, localStorage }) {
+  constructor({ document, onNavigate, store, localStorage, data }) {
     this.document = document;
     this.onNavigate = onNavigate;
     this.store = store;
+    this.data = data;
     const formNewBill = this.document.querySelector(
       `form[data-testid="form-new-bill"]`
     );
@@ -27,6 +28,9 @@ export default class NewBill {
     const email = JSON.parse(localStorage.getItem("user")).email;
     formData.append("file", file);
     formData.append("email", email);
+    // TODO Fix unexpected bug : choosing a receipt without saving the bill will still save it
+    this.formData = formData
+    this.fileName = fileName
     // TODO FIX [Bug Hunt] - Bills
     const sendButton = window.document.getElementById("btn-send-bill");
     const acceptedTypes = ["image/png", "image/jpeg", "image/jpg"];
@@ -35,21 +39,22 @@ export default class NewBill {
     } else {
       sendButton.setAttribute("disabled", "");
     }
-    this.store
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true,
-        },
-      })
-      .then(({ fileUrl, key }) => {
-        console.log(fileUrl);
-        this.billId = key;
-        this.fileUrl = fileUrl;
-        this.fileName = fileName;
-      })
-      .catch((error) => console.error(error));
+    // TODO Fix unexpected bug : choosing a receipt without saving the bill will still save it
+    // this.store
+    //   .bills()
+    //   .create({
+    //     data: formData,
+    //     headers: {
+    //       noContentType: true,
+    //     },
+    //   })
+    //   .then(({ fileUrl, key }) => {
+    //     console.log(fileUrl);
+    //     this.billId = key;
+    //     this.fileUrl = fileUrl;
+    //     this.fileName = fileName;
+    //   })
+    //   .catch((error) => console.error(error));
   };
   handleSubmit = (e) => {
     e.preventDefault();
@@ -76,8 +81,24 @@ export default class NewBill {
       fileName: this.fileName,
       status: "pending",
     };
-    this.updateBill(bill);
-    this.onNavigate(ROUTES_PATH["Bills"]);
+    // TODO Fix unexpected bug : choosing a receipt without saving the bill will still save it
+    this.store
+    .bills()
+    .create({
+      data: this.formData,
+      headers: {
+        noContentType: true,
+      },
+    })
+    .then(({ fileUrl, key }) => {
+      console.log(fileUrl);
+      this.billId = key;
+      this.fileUrl = fileUrl;
+      this.fileName = this.fileName;
+      this.updateBill(bill);
+      this.onNavigate(ROUTES_PATH["Bills"]);
+    })
+    .catch((error) => console.error(error));
   };
 
   // not need to cover this function by tests
@@ -93,3 +114,4 @@ export default class NewBill {
     }
   };
 }
+
